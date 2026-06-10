@@ -38,9 +38,14 @@ Stages communicate only through parquet files in `data/` (gitignored, but persis
 
 **`keywords.py`** is the shared vocabulary module: brand term lists, compiled regexes (used by steps 2–3), generated SQL `LIKE` clauses (used by step 1), and `LAUNCH_EVENTS` product-launch dates overlaid on time-series charts. Adding a brand term here propagates to both the SQL filter and the Python tagging — but step 1 must be re-run for the SQL side to take effect.
 
-## Remote (cloud) session environment
+## Execution environments
 
-Sessions started from the Claude app/web run in Anthropic's managed sandbox (Ubuntu, ephemeral container, fresh repo clone — `data/` and `charts/` do not carry over between sessions). The default environment uses the **Trusted** network policy: package registries (PyPI etc.) and GitHub work, but `huggingface.co`, `hacker-news.firebaseio.com`, and `hn.algolia.com` are all blocked (403 "Host not in allowlist"), so step 1 cannot download data under the default policy. To run the full pipeline in a cloud session, the environment must be edited at claude.ai/code (environment selector → settings) to use **Custom** network access with `huggingface.co` and `*.huggingface.co` allowed; `HF_TOKEN` can be set in the environment's variables and `pip install -r requirements.txt` in its setup script. Steps 2–5 need no network and run anywhere `data/` already exists (`05` accepts `--data-dir`).
+This project runs in two different places — check which one you're in before assuming capabilities (e.g. `curl -s -o /dev/null -w "%{http_code}" https://huggingface.co` to test network reach):
+
+- **The user's own PC** — fewer restrictions: full network access, and `data/`/`charts/` persist between sessions. The full pipeline including step 1's download works normally.
+- **Anthropic's managed cloud sandbox** (sessions started from the Claude app/web) — Ubuntu, ephemeral container, fresh repo clone: `data/` and `charts/` do not carry over between sessions, so only pushed work survives. The default environment uses the **Trusted** network policy: package registries (PyPI etc.) and GitHub work, but `huggingface.co`, `hacker-news.firebaseio.com`, and `hn.algolia.com` are all blocked (403 "Host not in allowlist"), so step 1 cannot download data under the default policy. To run the full pipeline in a cloud session, the environment must be edited at claude.ai/code (environment selector → settings) to use **Custom** network access with `huggingface.co` and `*.huggingface.co` allowed; `HF_TOKEN` can be set in the environment's variables and `pip install -r requirements.txt` in its setup script.
+
+Steps 2–5 need no network and run in either environment as long as `data/` exists (`05` accepts `--data-dir`).
 
 ## Conventions and gotchas
 
