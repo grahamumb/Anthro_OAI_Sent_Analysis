@@ -11,6 +11,7 @@ STEPS = [
     "src/02_sentiment.py",
     "src/03_analysis.py",
     "src/04_visualize.py",
+    "src/05_consistency_report.py",
 ]
 
 root = Path(__file__).parent.parent

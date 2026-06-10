@@ -33,6 +33,8 @@ Stages communicate only through parquet files in `data/` (gitignored, but persis
 3. **`03_analysis.py`** — per-user profiles (sentiment skew, brand lean, off-topic rate, etc.), a weighted composite `suspicion_score` (tunables `MIN_AI_COMMENTS`, `SUSPICION_TOP_N`, `SIM_THRESHOLD` at top of file), weekly temporal sentiment with 8-week rolling baseline and deviation z-scores, TF-IDF cosine-similarity talking-point pairs, and a thread co-appearance network.
    → `user_profiles.parquet`, `suspicious_users.parquet`, `temporal_sentiment.parquet`, `talking_point_clusters.parquet`
 4. **`04_visualize.py`** — 9 charts to `charts/` (matplotlib/seaborn PNGs + plotly HTML for the similarity network and suspicion leaderboard). Uses the `Agg` backend; never needs a display.
+5. **`05_consistency_report.py`** — interactive HTML report of the top 50 most *consistently positive* users per brand (Wilson lower bound of positive share among brand-exclusive comments; click a user to see their comments/stories in a side panel). Only needs step 2's output. Supports `--data-dir`/`--out` overrides, which the other steps don't.
+   → `charts/10_consistency_report.html`, `data/consistent_boosters.parquet`
 
 **`keywords.py`** is the shared vocabulary module: brand term lists, compiled regexes (used by steps 2–3), generated SQL `LIKE` clauses (used by step 1), and `LAUNCH_EVENTS` product-launch dates overlaid on time-series charts. Adding a brand term here propagates to both the SQL filter and the Python tagging — but step 1 must be re-run for the SQL side to take effect.
 
